@@ -1,6 +1,8 @@
 package com.jeff.importexcel.service.implement;
 
 import com.jeff.importexcel.domain.dto.PersonDto;
+import com.jeff.importexcel.exception.ExportPersonListException;
+import com.jeff.importexcel.exception.ExtractDataException;
 import com.jeff.importexcel.service.ExcelService;
 import lombok.extern.log4j.Log4j2;
 import org.apache.poi.ss.usermodel.Cell;
@@ -13,11 +15,11 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.time.ZonedDateTime;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 @Service
 @Log4j2
@@ -66,7 +68,8 @@ public class ExcelServiceImpl implements ExcelService {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("An exception occurred when extract data from the excel file", e);
+            throw new ExtractDataException();
         }
 
         return personDtoList;
@@ -97,8 +100,8 @@ public class ExcelServiceImpl implements ExcelService {
         headerCell = header.createCell(3);
         headerCell.setCellValue("date");
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E MMM dd HH:mm:ss zzz yyyy", Locale.US);
-        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E MMM dd HH:mm:ss zzz yyyy", Locale.US);
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         int rowIndex = 1;
 
         for (PersonDto personDto : personDtoList) {
@@ -116,9 +119,9 @@ public class ExcelServiceImpl implements ExcelService {
 
             cell = row.createCell(3);
             String dateNaissance = personDto.getDate();
-            ZonedDateTime inputDateNaissance = ZonedDateTime.parse(dateNaissance, formatter);
-            String formatDateNaissance = inputDateNaissance.format(outputFormatter);
-            cell.setCellValue(formatDateNaissance);
+//            ZonedDateTime inputDateNaissance = ZonedDateTime.parse(dateNaissance, formatter);
+//            String formatDateNaissance = inputDateNaissance.format(outputFormatter);
+            cell.setCellValue(dateNaissance);
 
             rowIndex++;
         }
@@ -131,9 +134,22 @@ public class ExcelServiceImpl implements ExcelService {
      * @param workbook Le fichier à exporter
      */
     public void exportPersonList(Workbook workbook) {
+        // todo créer une méthode utilitaire pour gérer la transformation de la date
+        // Create a DateTimeFormatter for the input format (ISO 8601 with nanoseconds)
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ISO_INSTANT;
+
+        // Parse the date-time string into an Instant
+        String instantDate = Instant.now().toString();
+        Instant instant = Instant.from(inputFormatter.parse(instantDate));
+
+        // Create a DateTimeFormatter for the desired output format
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH mm ss");
+
+        // Format the parsed date-time as "yyyy-MM-dd HH:mm:ss"
+        String formattedDate = instant.atZone(ZoneId.of("UTC")).format(outputFormatter);
 
         String path = "C:\\Users\\Jeff\\Documents\\excel\\";
-        String fileName = "exportListPerson.xlsx";
+        String fileName = "exportListPerson_" + formattedDate + ".xlsx";
         String filePath = path + fileName;
         File file = new File(filePath);
 
@@ -144,8 +160,7 @@ public class ExcelServiceImpl implements ExcelService {
 
         } catch (Exception e) {
             log.error("An exception occurred when saving the export file", e);
-            throw new RuntimeException(); // todo : créer une custom exception
+            throw new ExportPersonListException();
         }
     }
-
 }

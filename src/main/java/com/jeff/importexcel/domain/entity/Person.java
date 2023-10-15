@@ -4,10 +4,11 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 @Entity(name = "Person")
 @Table(name = "person")
-@SequenceGenerator(name = "PersonIdGenerator", sequenceName = "PER_ID_SEQ", allocationSize = 1)
+@SequenceGenerator(name = "PersonIdGenerator", sequenceName = "PER_SEQ", allocationSize = 1)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -30,5 +31,5 @@ public class Person implements Serializable {
     private Integer age;
 
     @Column(name = "per_date")
-    private String date;
+    private LocalDate date;
 }
