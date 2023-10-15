@@ -2,12 +2,13 @@ package com.jeff.importexcel.domain.dto;
 
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class PersonDto {
 
 
@@ -25,3 +26,4 @@ public class PersonDto {
     @PastOrPresent
     private String date;
 }
+

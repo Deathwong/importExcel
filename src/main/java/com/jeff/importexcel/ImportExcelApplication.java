@@ -1,6 +1,7 @@
 package com.jeff.importexcel;
 
-import com.jeff.importexcel.domain.entity.Person;
+import com.jeff.importexcel.domain.dto.PersonDto;
+import com.jeff.importexcel.service.ExcelService;
 import com.jeff.importexcel.service.PersonService;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -15,6 +16,7 @@ import java.util.List;
 public class ImportExcelApplication implements CommandLineRunner {
 
     private final PersonService personService;
+    private final ExcelService excelService;
 
     public static void main(String[] args) {
         SpringApplication.run(ImportExcelApplication.class, args);
@@ -25,12 +27,12 @@ public class ImportExcelApplication implements CommandLineRunner {
         try {
 
 //            FileInputStream fichierExcel = new FileInputStream("src/main/java/com/jeff/importexcel/data/excel.xlsx");
-//            List<Person> personList = personService.extractData(fichierExcel);
+//            List<PersonDto> personList = excelService.extractData(fichierExcel);
 //            personService.save(personList);
 
-            List<Person> personList = personService.getAll();
-            Workbook workbook = personService.generateExcel(personList);
-            personService.exportPersonList(workbook);
+            List<PersonDto> personDtoList = personService.getAll();
+            Workbook workbook = excelService.generateExcel(personDtoList);
+            excelService.exportPersonList(workbook);
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
