@@ -25,10 +25,10 @@ public class MailServiceImpl implements MailService {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-            String[] mails = new String[]{"baptistejean457@gmail.com", "nina.toulassi@outlook.fr"};
+            String[] mails = new String[]{""};
             helper.setTo(mails);
-            helper.setSubject("Envoyé Depuis ue application Java que j'ai développé ce week-end");
-            helper.setText("fichier");
+            helper.setSubject("Jean Test Mail");
+            helper.setText("Texte");
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
             try {
@@ -41,7 +41,9 @@ public class MailServiceImpl implements MailService {
 
             helper.addAttachment("fichier.xlsx", new ByteArrayResource(excelBytes));
 
-            emailSender.send(message);
+            for (int i = 0; i < 2; i++) {
+                emailSender.send(message);
+            }
 
         } catch (Exception exception) {
             throw new RuntimeException();
